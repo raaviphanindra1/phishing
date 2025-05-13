@@ -1,4 +1,3 @@
-import src
 from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
 from src.utils.check_url import analyze_url
