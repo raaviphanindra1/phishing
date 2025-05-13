@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Phishing Website Detector</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; margin-top: 50px; }
+        input { padding: 10px; width: 300px; }
+        button { padding: 10px 20px; margin-left: 10px; }
+        .result { margin-top: 20px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h2>Phishing Website Detector</h2>
+    <input type="text" id="urlInput" placeholder="Enter website URL">
+    <button onclick="checkURL()">Check</button>
+
+    <div class="result" id="result"></div>
+
+    <script>
+        async function checkURL() {
+            const url = document.getElementById('urlInput').value;
+            const resultDiv = document.getElementById('result');
+
+            if (!url) {
+                resultDiv.innerHTML = "Please enter a URL.";
+                return;
+            }
+
+            resultDiv.innerHTML = "Checking...";
+
+            try {
+                const response = await fetch('/api/check-url', { 
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url })
+                });
+
+                const data = await response.json();
+
+                if (data.error) {
+                    resultDiv.innerHTML = `Error: ${data.error}`;
+                } else if (data.suspicious) {
+                    resultDiv.innerHTML = `<span style="color:red;">Suspicious Website!</span><br>Reasons:<ul>${data.reason.map(r => `<li>${r}</li>`).join('')}</ul>`;
+                } else {
+                    resultDiv.innerHTML = `<span style="color:green;">Safe Website ✅</span>`;
+                }
+            } catch (err) {
+                console.error(err);
+                resultDiv.innerHTML = "Failed to check URL. Check backend server.";
+            }
+        }
+    </script>
+</body>
+</html>
